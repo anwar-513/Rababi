@@ -9,7 +9,7 @@ body {
 
 nav {
     font-family: "Galindo", sans-serif;
-    color: #F5F7FA; 
+    color: #F5F7FA;
 }
 
 nav ul {
@@ -36,4 +36,85 @@ nav ul {
     margin-top: 10px;
     width: 40px;
     border-radius: 70px;
+}
+
+.mainBox {
+    min-height: 72vh;
+}
+
+.buttom {
+    position: sticky;
+    height: 80px;
+    background: #8B5A1A;
+    display: flex;
+    list-style-type: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+ul li {
+    list-style-type: none;
+}
+
+#progressbar {
+    width: 80%;
+    cursor: pointer;
+}
+
+
+ul {
+    margin-top: 10px;
+    display: flex;
+}
+
+.icons.icon {
+    display: flex;
+}
+
+.icons li {
+    cursor: pointer;
+}
+
+.icon {
+    margin-left: 8px;
+}
+
+.soundBar {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+
+    color: black;
+    text-align: center;
+    cursor: pointer;
+
+}
+
+#soundBar::-webkit-slider-runnable-track {
+    background: black;
+    height: 6px;
+    border-radius: 5px;
+}
+
+#soundBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 18px;
+    height: 18px;
+    background: #280900;
+    border-radius: 50%;
+    margin-top: -6px;
+    cursor: pointer;
+}
+
+.songList {
+    position: absolute;
+    right: 0;
+}
+
+.backgound {
+    width: 500px;
+    height: 400px;
 }
