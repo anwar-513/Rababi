@@ -1,0 +1,39 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: bisque;
+}
+
+nav {
+    font-family: "Galindo", sans-serif;
+    color: #F5F7FA; 
+}
+
+nav ul {
+    display: flex;
+    align-items: center;
+    font-size: 45px;
+    margin-left: 20px;
+}
+
+.name {
+    margin-left: 28px;
+}
+
+.top {
+    height: 100px;
+    background-color: #8B5A1A;
+}
+
+.brand {
+    list-style-type: none;
+}
+
+.image img {
+    margin-top: 10px;
+    width: 40px;
+    border-radius: 70px;
+}
