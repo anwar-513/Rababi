@@ -10,83 +10,133 @@ body {
 nav {
     font-family: "Galindo", sans-serif;
     color: #F5F7FA;
+    height: 80px;
+    background-color: #93662c;
+    margin: 0;
+    padding: 0;
 }
 
 nav ul {
     display: flex;
     align-items: center;
     font-size: 45px;
+
+    margin: 0;
     margin-left: 20px;
+    padding: 0;
 }
 
 .name {
     margin-left: 28px;
 }
 
-.top {
-    height: 100px;
-    background-color: #8B5A1A;
-}
-
-.brand {
+ul li {
     list-style-type: none;
 }
 
-.image img {
-    margin-top: 10px;
+.brandImage img {
+    margin-top: 2px;
+    height: 75px;
     width: 40px;
-    border-radius: 70px;
+    border-radius: 40px;
+
 }
 
 .mainBox {
-    min-height: 72vh;
+    min-height: 70vh;
+    font-family: "Galindo", sans-serif;
+    display: flex;
+    flex-direction: column;
+    margin: 5px auto;
+    width: 85%;
+    border-radius: 14px;
+    background-image: url(bg.png);
+    padding: 10px 10px;
+    color: rgb(49, 30, 8);
 }
+
+
+.songItem {
+    background-color: #a7a5a2;
+    border-radius: 30px;
+    display: flex;
+    height: 60px;
+    display: flex;
+    margin: 12px 0;
+    color: #936f46;
+    align-items: center;
+    width: 350px;
+
+}
+
+.songItem img {
+    height: 45px;
+    border-radius: 34px;
+    margin-left: 5px;
+
+}
+
+.songTime {
+    font-size: 8px;
+    margin-left: 12px;
+}
+
+
+
+
+
 
 .buttom {
     position: sticky;
     height: 80px;
-    background: #8B5A1A;
+    background: #93662c;
     display: flex;
+    width: 100%;
     list-style-type: none;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
 
-ul li {
-    list-style-type: none;
-}
+
 
 #progressbar {
     width: 80%;
     cursor: pointer;
 }
 
+#progressbar::-webkit-slider-runnable-track {
+    background: black;
+    height: 6px;
+    border-radius: 5px;
+}
+
+#progressbar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 18px;
+    height: 18px;
+    background: #280900;
+    border-radius: 50%;
+    margin-top: -6px;
+}
 
 ul {
     margin-top: 10px;
     display: flex;
 }
 
-.icons.icon {
-    display: flex;
-}
-
 .icons li {
     cursor: pointer;
-}
-
-.icon {
     margin-left: 8px;
 }
+
 
 .soundBar {
     position: absolute;
     right: 20px;
     bottom: 20px;
-
-    color: black;
-    text-align: center;
     cursor: pointer;
 
 }
@@ -107,14 +157,4 @@ ul {
     border-radius: 50%;
     margin-top: -6px;
     cursor: pointer;
-}
-
-.songList {
-    position: absolute;
-    right: 0;
-}
-
-.backgound {
-    width: 500px;
-    height: 400px;
 }
