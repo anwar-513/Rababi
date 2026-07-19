@@ -57,20 +57,20 @@ ul li {
 
 
 .songItem {
-    background-color: #a7a5a2;
+    background-color: #5e3507;
     border-radius: 30px;
     display: flex;
-    height: 60px;
+    height: 45px;
     display: flex;
     margin: 12px 0;
-    color: #936f46;
+    color: #eadbc9;
     align-items: center;
     width: 350px;
 
 }
 
 .songItem img {
-    height: 45px;
+    height: 35px;
     border-radius: 34px;
     margin-left: 5px;
 
@@ -127,7 +127,7 @@ ul {
     display: flex;
 }
 
-.icons li {
+.icon {
     cursor: pointer;
     margin-left: 8px;
 }
