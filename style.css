@@ -4,7 +4,7 @@
 }
 
 body {
-    background-color: bisque;
+    background-color: rgb(249, 216, 175);
 }
 
 nav {
@@ -50,7 +50,7 @@ ul li {
     margin: 5px auto;
     width: 85%;
     border-radius: 14px;
-    background-image: url(bg.png);
+    background-image: url("bg.png");
     padding: 10px 10px;
     color: rgb(49, 30, 8);
 }
@@ -61,11 +61,13 @@ ul li {
     border-radius: 30px;
     display: flex;
     height: 45px;
+    font-size: 12px;
     display: flex;
-    margin: 12px 0;
+    margin: 12px;
+    padding: 0 10px;
     color: #eadbc9;
     align-items: center;
-    width: 350px;
+    width: fit-content;
 
 }
 
@@ -78,15 +80,15 @@ ul li {
 
 .songTime {
     font-size: 8px;
-    margin-left: 12px;
+    padding: 12px;
 }
 
 
 
 
 
-
 .buttom {
+    font-family: "Galindo", sans-serif;
     position: sticky;
     height: 80px;
     background: #93662c;
@@ -157,4 +159,27 @@ ul {
     border-radius: 50%;
     margin-top: -6px;
     cursor: pointer;
+}
+
+.songName {
+    position: absolute;
+    left: 0;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.songName img {
+    width: 56px;
+    height: 46px;
+    display: block;
+    opacity: 0;
+    transition: opacity 1s ease-in;
+}
+
+.songName span {
+    font-size: 19px;
+    padding: 10px 0;
+    margin-left: 5px;
+    margin-top: 5px;
 }
