@@ -62,3 +62,9 @@ forward.addEventListener('click', () => {
 backward.addEventListener('click', () => {
     audioElement.currentTime = audioElement.currentTime - 10;
 })
+
+
+soundBar.addEventListener("input", () => {
+    audioElement.volume = soundBar.value / 100;
+});
+
