@@ -9,6 +9,7 @@ let backward = document.getElementById('backward');
 let nextStep = document.getElementById('nextStep');
 let backStep = document.getElementById('backStep');
 let songItems = Array.from(document.getElementsByClassName('songItem'));
+let songNameSpan = document.querySelector('.songName span');
 
 
 
@@ -40,6 +41,7 @@ songItems.forEach((element, i) => {
             songIndex = i;
             audioElement.src = songs[i].filePath;
             audioElement.play();
+            songNameSpan.innerText = songs[songIndex].songName;
         }
         else if (audioElement.paused) {
             audioElement.play();
@@ -122,6 +124,7 @@ nextStep.addEventListener('click', () => {
     songIndex = (songIndex + 1) % songs.length;
     audioElement.src = songs[songIndex].filePath;
     audioElement.play();
+    songNameSpan.innerText = songs[songIndex].songName;
 
     songItems.forEach((el, idx) => {
         let icon = el.querySelector('#btn-icon');
@@ -137,6 +140,7 @@ backStep.addEventListener('click', () => {
     songIndex = (songIndex - 1 + songs.length) % songs.length;
     audioElement.src = songs[songIndex].filePath;
     audioElement.play();
+    songNameSpan.innerText = songs[songIndex].songName;
 
     songItems.forEach((el, idx) => {
         let icon = el.querySelector('#btn-icon');

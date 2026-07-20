@@ -173,6 +173,10 @@ ul {
     width: 56px;
     height: 46px;
     display: block;
+
+}
+
+#gif {
     opacity: 0;
     transition: opacity 1s ease-in;
 }
