@@ -1,18 +1,20 @@
 let songIndex = 0;
 let audioElement = new Audio('songs/1.mp3');
-let play = document.getElementById('playIcon')
+let play = document.getElementById('playIcon');
 let progressbar = document.getElementById('progressbar');
 let soundbar = document.getElementById('soundBar');
-let gif = document.getElementById('gif');
 let forward = document.getElementById('forward');
 let backward = document.getElementById('backward');
 let nextStep = document.getElementById('nextStep');
 let backStep = document.getElementById('backStep');
 let songItems = Array.from(document.getElementsByClassName('songItem'));
-let songNameSpan = document.querySelector('.songName span');
+let songNameContainer = document.querySelector('.buttom .songName');
+let songNameSpan = songNameContainer.querySelector('span');
+let bottomGif = songNameContainer.querySelector('img');
 
-
-
+// Default the volume slider to max instead of the middle
+soundbar.value = 100;
+audioElement.volume = 1;
 
 let songs = [
     { songName: "Azhar Khan new Song", filePath: "songs/1.mp3", coverPath: "covers/1.jfif" },
@@ -26,9 +28,48 @@ function formatTime(seconds) {
     return String(minutes).padStart(2, '0') + ":" + String(secs).padStart(2, '0');
 }
 
+// Restarts the CSS animation on the bottom song name every time it's called
+function triggerNameAnimation() {
+    songNameContainer.classList.remove('playing');
+    void songNameContainer.offsetWidth; // force reflow so the animation can replay
+    songNameContainer.classList.add('playing');
+}
+
+// Single source of truth for syncing every icon/gif/name whenever play state changes
+function updateUI(isPlaying) {
+    play.src = isPlaying ? "icons/pause-solid-full.svg" : "icons/play-solid-full.svg";
+    isPlaying ? play.classList.remove('play') : play.classList.add('play');
+
+    bottomGif.style.opacity = isPlaying ? 1 : 0;
+    songNameSpan.innerText = songs[songIndex].songName;
+
+    if (isPlaying) {
+        triggerNameAnimation();
+    } else {
+        songNameContainer.classList.remove('playing');
+    }
+
+    songItems.forEach((el, idx) => {
+        let icon = el.querySelector('#btn-icon');
+        let itemGif = el.getElementsByTagName('img')[1];
+        let isActiveSong = idx === songIndex && isPlaying;
+
+        icon.src = isActiveSong ? "icons/pause-solid-full.svg" : "icons/play-solid-full.svg";
+        itemGif.style.opacity = isActiveSong ? 1 : 0;
+    });
+}
+
+function playSong(index) {
+    songIndex = index;
+    audioElement.src = songs[index].filePath;
+    audioElement.play();
+    updateUI(true);
+}
+
 songItems.forEach((element, i) => {
     element.getElementsByTagName("img")[0].src = songs[i].coverPath;
     element.getElementsByClassName("itamName")[0].innerText = songs[i].songName;
+    element.getElementsByTagName("img")[1].style.opacity = 0; // hide each item's gif initially
 
     let timeSpan = element.getElementsByClassName("songTime")[0];
     let tempAudio = new Audio(songs[i].filePath);
@@ -38,74 +79,39 @@ songItems.forEach((element, i) => {
 
     element.querySelector('#play-pause-btn').addEventListener('click', () => {
         if (songIndex !== i) {
-            songIndex = i;
-            audioElement.src = songs[i].filePath;
-            audioElement.play();
-            songNameSpan.innerText = songs[songIndex].songName;
+            playSong(i);
         }
         else if (audioElement.paused) {
             audioElement.play();
+            updateUI(true);
         }
         else {
             audioElement.pause();
-        }
-
-        songItems.forEach((el, idx) => {
-            let icon = el.querySelector('#btn-icon');
-            if (idx === songIndex && !audioElement.paused) {
-                icon.src = "icons/pause-solid-full.svg";
-            } else {
-                icon.src = "icons/play-solid-full.svg";
-            }
-        });
-
-        if (!audioElement.paused) {
-            play.src = "icons/pause-solid-full.svg";
-            play.classList.remove('play');
-            gif.style.opacity = 1;
-        } else {
-            play.src = "icons/play-solid-full.svg";
-            play.classList.add('play');
-            gif.style.opacity = 0;
+            updateUI(false);
         }
     });
 })
 
-
 play.addEventListener('click', () => {
     if (audioElement.paused) {
-        audioElement.play()
-        play.classList.remove('play');
-        play.src = "icons/pause-solid-full.svg";
-        gif.style.opacity = 1;
+        audioElement.play();
+        updateUI(true);
     }
     else {
-        audioElement.pause()
-        play.classList.add('play');
-        play.src = "icons/play-solid-full.svg";
-        gif.style.opacity = 0;
+        audioElement.pause();
+        updateUI(false);
     }
-
-    let currentIcon = songItems[songIndex].querySelector('#btn-icon');
-    currentIcon.src = audioElement.paused ? "icons/play-solid-full.svg" : "icons/pause-solid-full.svg";
 })
 
 audioElement.addEventListener('timeupdate', () => {
     let progress = ((audioElement.currentTime / audioElement.duration) * 100)
-
     progressbar.value = progress;
 }
 )
 
 audioElement.addEventListener('ended', () => {
-    play.classList.add('play');
-    play.src = "icons/play-solid-full.svg";
-    gif.style.opacity = 0;
-
-    let currentIcon = songItems[songIndex].querySelector('#btn-icon');
-    currentIcon.src = "icons/play-solid-full.svg";
+    updateUI(false);
 })
-
 
 progressbar.addEventListener('change', () => {
     audioElement.currentTime = progressbar.value * audioElement.duration / 100
@@ -121,37 +127,12 @@ backward.addEventListener('click', () => {
 })
 
 nextStep.addEventListener('click', () => {
-    songIndex = (songIndex + 1) % songs.length;
-    audioElement.src = songs[songIndex].filePath;
-    audioElement.play();
-    songNameSpan.innerText = songs[songIndex].songName;
-
-    songItems.forEach((el, idx) => {
-        let icon = el.querySelector('#btn-icon');
-        icon.src = (idx === songIndex) ? "icons/pause-solid-full.svg" : "icons/play-solid-full.svg";
-    });
-
-    play.src = "icons/pause-solid-full.svg";
-    play.classList.remove('play');
-    gif.style.opacity = 1;
+    playSong((songIndex + 1) % songs.length);
 })
 
 backStep.addEventListener('click', () => {
-    songIndex = (songIndex - 1 + songs.length) % songs.length;
-    audioElement.src = songs[songIndex].filePath;
-    audioElement.play();
-    songNameSpan.innerText = songs[songIndex].songName;
-
-    songItems.forEach((el, idx) => {
-        let icon = el.querySelector('#btn-icon');
-        icon.src = (idx === songIndex) ? "icons/pause-solid-full.svg" : "icons/play-solid-full.svg";
-    });
-
-    play.src = "icons/pause-solid-full.svg";
-    play.classList.remove('play');
-    gif.style.opacity = 1;
+    playSong((songIndex - 1 + songs.length) % songs.length);
 })
-
 
 soundbar.addEventListener("input", () => {
     audioElement.volume = soundbar.value / 100;

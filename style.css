@@ -186,4 +186,28 @@ ul {
     padding: 10px 0;
     margin-left: 5px;
     margin-top: 5px;
+    display: inline-block;
+    opacity: 0;
+}
+
+
+.songName.playing span {
+    animation: fadeSlideIn 0.5s ease forwards;
+}
+
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.songName img {
+    transition: opacity 0.4s ease;
 }
