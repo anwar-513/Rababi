@@ -11,7 +11,7 @@ nav {
     font-family: "Galindo", sans-serif;
     color: #F5F7FA;
     height: 80px;
-    background-color: #93662c;
+    background-color: #DC8415;
     margin: 0;
     padding: 0;
 }
@@ -57,8 +57,10 @@ ul li {
 
 
 .songItem {
-    background-color: #5e3507;
+    background-color: #78460998;
+    border: #280900 solid 2px;
     border-radius: 30px;
+
     display: flex;
     height: 45px;
     font-size: 12px;
@@ -91,7 +93,7 @@ ul li {
     font-family: "Galindo", sans-serif;
     position: sticky;
     height: 80px;
-    background: #93662c;
+    background: #DC8415;
     display: flex;
     width: 100%;
     list-style-type: none;
