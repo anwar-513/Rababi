@@ -11,6 +11,7 @@ let songItems = Array.from(document.getElementsByClassName('songItem'));
 let songNameContainer = document.querySelector('.buttom .songName');
 let songNameSpan = songNameContainer.querySelector('span');
 let bottomGif = songNameContainer.querySelector('img');
+let timelineSpan = document.querySelector('.buttom .timeline');
 
 // Default the volume slider to max instead of the middle
 soundbar.value = 100;
@@ -106,11 +107,13 @@ play.addEventListener('click', () => {
 audioElement.addEventListener('timeupdate', () => {
     let progress = ((audioElement.currentTime / audioElement.duration) * 100)
     progressbar.value = progress;
+    timelineSpan.innerText = formatTime(audioElement.currentTime);
 }
 )
 
 audioElement.addEventListener('ended', () => {
     updateUI(false);
+    timelineSpan.innerText = "00:00";
 })
 
 progressbar.addEventListener('change', () => {

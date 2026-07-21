@@ -89,6 +89,7 @@ ul li {
 
 
 
+
 .buttom {
     font-family: "Galindo", sans-serif;
     position: sticky;
@@ -103,6 +104,10 @@ ul li {
 }
 
 
+.timeline {
+    font-size: 15px;
+    margin-left: 1000px;
+}
 
 #progressbar {
     width: 80%;
@@ -144,6 +149,7 @@ ul {
     cursor: pointer;
 
 }
+
 
 #soundBar::-webkit-slider-runnable-track {
     background: black;
