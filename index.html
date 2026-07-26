@@ -22,32 +22,23 @@
     </nav>
 
     <div class="mainBox">
-        <div class="playlist">
-            <h1>YadGar-e-Donya</h1>
+        <div class="searchPanel">
+            <h2>Search Music</h2>
+            <form id="searchForm" class="searchForm">
+                <input type="text" id="searchInput" placeholder="Search a song on Jamendo...">
+                <button type="submit">Search</button>
+            </form>
+            <div class="searchResults" id="searchResults"></div>
+        </div>
 
-            <div class="songItem">
-                <img class="song" src="covers/1.jfif" alt="1">
-                <span class="itamName"> Aman Tappy - Azhar Khan</span>
-                <span class="songlistplay"></span>
-                <img src="gif.gif" alf="gif" id="gif"><span class="songTime">08:38</span> <i id="play-pause-btn"> <img
-                        id="btn-icon" class="icon" src="icons/play-solid-full.svg" alt="play" width="20"> </i>
-                </span>
+        <div class="playlistPanel">
+            <div class="playlistTabs" id="playlistTabs">
+                <button class="tabBtn active" data-list="default">YadGar-e-Donya</button>
+                <button id="newPlaylistBtn" class="tabBtn newPlaylistBtn" type="button">+ New Playlist</button>
             </div>
-            <div class="songItem">
-                <img src="covers/2.png" alt="2">
-                <span class="itamName">Stargy Ghazzal - Haroon Bacha</span>
-                <span class="songlistplay"></span>
-                <img src="gif.gif" alf="gif" id="gif"> <span class="songTime">06:14</span> <i id="play-pause-btn"> <img
-                        id="btn-icon" class="icon" src="icons/play-solid-full.svg" alt="play" width="20"> </i>
-                </span>
-            </div>
-            <div class="songItem">
-                <img src="covers/3.jfif" alt="3">
-                <span class="itamName">Liwany Azhar Khan</span>
-                <span class="songlistplay"></span>
-                <img src="gif.gif" alf="gif" id="gif"> <span class="songTime">05:41</span> <i id="play-pause-btn"> <img
-                        id="btn-icon" class="icon" src="icons/play-solid-full.svg" alt="play" width="20"> </i>
-                </span>
+
+            <div class="playlist" id="playlist">
+                <h1 id="playlistTitle">YadGar-e-Donya</h1>
             </div>
         </div>
     </div>

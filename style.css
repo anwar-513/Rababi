@@ -46,13 +46,48 @@ ul li {
     min-height: 70vh;
     font-family: "Galindo", sans-serif;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
     margin: 5px auto;
     width: 85%;
     border-radius: 14px;
-    background-image: url("bg.png");
     padding: 10px 10px;
     color: rgb(49, 30, 8);
+}
+
+.searchPanel,
+.playlistPanel {
+    background: #78460930;
+    border: #280900 solid 2px;
+    border-radius: 20px;
+    padding: 14px;
+    background-image: url("bg.png");
+}
+
+.searchPanel {
+    flex: 0 0 35%;
+}
+
+.playlistPanel {
+    flex: 1;
+    min-width: 0;
+}
+
+.searchPanel h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 800px) {
+    .mainBox {
+        flex-direction: column;
+    }
+
+    .searchPanel {
+        flex: 1;
+        width: 100%;
+    }
 }
 
 
@@ -65,12 +100,20 @@ ul li {
     height: 45px;
     font-size: 12px;
     display: flex;
-    margin: 12px;
+    margin: 12px 4px;
     padding: 0 10px;
     color: #eadbc9;
     align-items: center;
-    width: fit-content;
+    width: auto;
+    max-width: 100%;
+    overflow: hidden;
 
+}
+
+.songItem .itamName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .songItem img {
@@ -83,6 +126,90 @@ ul li {
 .songTime {
     font-size: 8px;
     padding: 12px;
+}
+
+.searchForm {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.searchForm input[type="text"] {
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: #280900 solid 2px;
+    background: #78460998;
+    color: #eadbc9;
+    font-family: "Galindo", sans-serif;
+    outline: none;
+}
+
+.searchForm input[type="text"]::placeholder {
+    color: #eadbc9c0;
+}
+
+.searchForm button {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: #280900 solid 2px;
+    background: #DC8415;
+    color: #F5F7FA;
+    font-family: "Galindo", sans-serif;
+    cursor: pointer;
+}
+
+.playlistTabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.tabBtn {
+    padding: 6px 14px;
+    border-radius: 16px;
+    border: #280900 solid 2px;
+    background: #78460998;
+    color: #eadbc9;
+    font-family: "Galindo", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.tabBtn.active {
+    background: #DC8415;
+    color: #F5F7FA;
+}
+
+.newPlaylistBtn {
+    background: transparent;
+    border-style: dashed;
+}
+
+.searchResults {
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.searchStatus {
+    color: #311e08;
+    font-size: 13px;
+    padding: 8px 4px;
+}
+
+.addToPlaylistBtn {
+    margin-left: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: #280900 solid 1px;
+    background: #DC8415;
+    color: #F5F7FA;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 
