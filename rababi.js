@@ -1,14 +1,6 @@
-// ============================================================
-// CONFIG — Audius just needs an app name to identify your app
-// in request logs, no signup or key required for basic search.
-// Feel free to rename this to your own app's name.
-// ============================================================
 const AUDIUS_APP_NAME = "RababiPlayer";
 const AUDIUS_API_BASE = "https://api.audius.co";
 
-// ============================================================
-// Core player elements
-// ============================================================
 let audioElement = new Audio();
 let play = document.getElementById('playIcon');
 let progressbar = document.getElementById('progressbar');
@@ -33,7 +25,11 @@ let searchResultsEl = document.getElementById('searchResults');
 soundbar.value = 100;
 audioElement.volume = 1;
 
-const defaultSongs = [
+// This is now only used ONCE, as seed data the first time the app ever
+// runs on a browser — after that, it lives in localStorage like any
+// other playlist the user creates, and can be renamed/edited/deleted
+// the same way.
+const seedSongs = [
     { songName: "Azhar Khan new Song", filePath: "songs/1.mp3", coverPath: "covers/1.jfif" },
     { songName: "Stargy Ghazal - Haroon Bacha", filePath: "songs/2.mp3", coverPath: "covers/2.png" },
     { songName: "Peakey - Azhar Khan", filePath: "songs/3.mp3", coverPath: "covers/3.jfif" },
@@ -55,7 +51,14 @@ function savePlaylists() {
 
 let playlists = loadPlaylists(); // { "My Playlist": [track, track, ...], ... }
 
-let currentPlaylist = defaultSongs; // whichever array next/back should navigate
+// First run ever (nothing in storage yet) — seed the built-in playlist once.
+if (Object.keys(playlists).length === 0) {
+    playlists["YadGar-e-Donya"] = seedSongs;
+    savePlaylists();
+}
+
+let activePlaylistName = Object.keys(playlists)[0] || null;
+let currentPlaylist = activePlaylistName ? playlists[activePlaylistName] : [];
 let songIndex = 0;
 let currentTrack = null;            // the track object actually loaded in audioElement
 
@@ -186,7 +189,40 @@ function createSongItemElement(track, options = {}) {
         el.appendChild(addBtn);
     }
 
+    if (options.playlistName) {
+        let removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'removeFromPlaylistBtn';
+        removeBtn.innerText = '×';
+        removeBtn.title = 'Remove from this playlist';
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeSongFromPlaylist(options.playlistName, track);
+        });
+        el.appendChild(removeBtn);
+    }
+
     return el;
+}
+
+// Removes one track from a named playlist, saves it, and refreshes
+// the view if that playlist happens to be the one on screen right now
+function removeSongFromPlaylist(playlistName, track) {
+    if (!playlists[playlistName]) return;
+
+    playlists[playlistName] = playlists[playlistName].filter(t => t.filePath !== track.filePath);
+    savePlaylists();
+
+    if (playlistName === activePlaylistName) {
+        renderPlaylist(playlists[playlistName], playlistName);
+
+        // Keep songIndex correct for next/back if the currently playing
+        // track is still in this (now shorter) playlist
+        if (currentTrack) {
+            let newIndex = currentPlaylist.indexOf(currentTrack);
+            if (newIndex !== -1) songIndex = newIndex;
+        }
+    }
 }
 
 // Renders an array of tracks into the main playlist panel
@@ -195,21 +231,20 @@ function renderPlaylist(list, title) {
     playlistTitle.innerText = title;
     playlistEl.querySelectorAll('.songItem').forEach(el => el.remove());
     list.forEach(track => {
-        playlistEl.appendChild(createSongItemElement(track, { list }));
+        playlistEl.appendChild(createSongItemElement(track, { list, playlistName: title }));
     });
 }
 
 function renderPlaylistTabs() {
     playlistTabs.querySelectorAll('.tabBtn').forEach(btn => {
-        if (btn.dataset.list !== 'default' && btn.id !== 'newPlaylistBtn') {
-            btn.remove();
-        }
+        if (btn.id !== 'newPlaylistBtn') btn.remove();
     });
 
     Object.keys(playlists).forEach(name => {
         let btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'tabBtn';
+        if (name === activePlaylistName) btn.classList.add('active');
 
         let label = document.createElement('span');
         label.innerText = name;
@@ -226,6 +261,7 @@ function renderPlaylistTabs() {
         btn.appendChild(deleteBtn);
 
         btn.addEventListener('click', () => {
+            activePlaylistName = name;
             setActiveTab(btn);
             renderPlaylist(playlists[name], name);
         });
@@ -236,27 +272,32 @@ function renderPlaylistTabs() {
 function deletePlaylist(name) {
     if (!confirm(`Delete the playlist "${name}"? This can't be undone.`)) return;
 
-    let wasActive = currentPlaylist === playlists[name];
+    let wasActive = name === activePlaylistName;
 
     delete playlists[name];
     savePlaylists();
-    renderPlaylistTabs();
 
     if (wasActive) {
-        setActiveTab(document.querySelector('.tabBtn[data-list="default"]'));
-        renderPlaylist(defaultSongs, "YadGar-e-Donya");
+        let remainingNames = Object.keys(playlists);
+        activePlaylistName = remainingNames[0] || null;
+
+        if (activePlaylistName) {
+            renderPlaylist(playlists[activePlaylistName], activePlaylistName);
+        } else {
+            currentPlaylist = [];
+            currentTrack = null;
+            playlistTitle.innerText = "No playlists yet";
+            playlistEl.querySelectorAll('.songItem').forEach(el => el.remove());
+        }
     }
+
+    renderPlaylistTabs();
 }
 
 function setActiveTab(activeBtn) {
     playlistTabs.querySelectorAll('.tabBtn').forEach(b => b.classList.remove('active'));
     activeBtn.classList.add('active');
 }
-
-document.querySelector('.tabBtn[data-list="default"]').addEventListener('click', (e) => {
-    setActiveTab(e.target);
-    renderPlaylist(defaultSongs, "YadGar-e-Donya");
-});
 
 newPlaylistBtn.addEventListener('click', () => {
     let name = prompt("Name your new playlist:");
@@ -267,7 +308,9 @@ newPlaylistBtn.addEventListener('click', () => {
     }
     playlists[name] = [];
     savePlaylists();
+    activePlaylistName = name;
     renderPlaylistTabs();
+    renderPlaylist(playlists[name], name);
 });
 
 function openAddToPlaylistPicker(track) {
@@ -395,4 +438,8 @@ soundbar.addEventListener("input", () => {
 });
 
 renderPlaylistTabs();
-renderPlaylist(defaultSongs, "YadGar-e-Donya");
+if (activePlaylistName) {
+    renderPlaylist(playlists[activePlaylistName], activePlaylistName);
+} else {
+    playlistTitle.innerText = "No playlists yet";
+}
