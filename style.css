@@ -48,7 +48,7 @@ ul li {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 10px;
+    gap: 14px;
     margin: 5px auto;
     width: 85%;
     border-radius: 14px;
@@ -58,26 +58,22 @@ ul li {
 
 .searchPanel,
 .playlistPanel {
-    background: #78460930;
+    background-color: #78460930;
+    background-image: url("bg.png");
+    background-size: cover;
+    background-position: center;
     border: #280900 solid 2px;
     border-radius: 20px;
     padding: 14px;
-    background-image: url("bg.png");
 }
 
 .searchPanel {
-    flex: 0 0 40%;
+    flex: 0 0 35%;
 }
-
 
 .playlistPanel {
     flex: 1;
     min-width: 0;
-}
-
-
-.playlistPanel#newPlaylistBtn {
-    justify-content: right;
 }
 
 .searchPanel h2 {
@@ -110,7 +106,7 @@ ul li {
     padding: 0 10px;
     color: #eadbc9;
     align-items: center;
-    width: auto;
+    width: fit-content;
     max-width: 100%;
     overflow: hidden;
 
@@ -168,7 +164,6 @@ ul li {
 .playlistTabs {
     display: flex;
     flex-wrap: wrap;
-    width: fit-content;
     gap: 8px;
     margin-bottom: 10px;
 }
@@ -182,6 +177,27 @@ ul li {
     font-family: "Galindo", sans-serif;
     font-size: 13px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.deletePlaylistBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #280900;
+    color: #eadbc9;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.deletePlaylistBtn:hover {
+    background: #DC8415;
 }
 
 .tabBtn.active {
@@ -221,10 +237,7 @@ ul li {
 
 
 
-.playlist {
 
-    width: fit-content;
-}
 
 
 .buttom {

@@ -1,8 +1,10 @@
 // ============================================================
-// CONFIG — replace with your own free client_id from
-// https://developer.jamendo.com (sign up, no cost, instant)
+// CONFIG — Audius just needs an app name to identify your app
+// in request logs, no signup or key required for basic search.
+// Feel free to rename this to your own app's name.
 // ============================================================
-const JAMENDO_CLIENT_ID = "YOUR_JAMENDO_CLIENT_ID";
+const AUDIUS_APP_NAME = "RababiPlayer";
+const AUDIUS_API_BASE = "https://api.audius.co";
 
 // ============================================================
 // Core player elements
@@ -31,23 +33,12 @@ let searchResultsEl = document.getElementById('searchResults');
 soundbar.value = 100;
 audioElement.volume = 1;
 
-// ============================================================
-// Your original 3 built-in songs — now just the starting data,
-// not hardcoded HTML. Every songItem on the page (default,
-// search results, or custom playlists) is built by the SAME
-// function below, so playback logic never has to care where a
-// track came from.
-// ============================================================
 const defaultSongs = [
     { songName: "Azhar Khan new Song", filePath: "songs/1.mp3", coverPath: "covers/1.jfif" },
     { songName: "Stargy Ghazal - Haroon Bacha", filePath: "songs/2.mp3", coverPath: "covers/2.png" },
     { songName: "Peakey - Azhar Khan", filePath: "songs/3.mp3", coverPath: "covers/3.jfif" },
 ];
 
-// ============================================================
-// Playlist persistence (localStorage — fine here, this is a
-// real site, not a sandboxed artifact)
-// ============================================================
 const STORAGE_KEY = "rababi_playlists";
 
 function loadPlaylists() {
@@ -64,16 +55,10 @@ function savePlaylists() {
 
 let playlists = loadPlaylists(); // { "My Playlist": [track, track, ...], ... }
 
-// ============================================================
-// Player state
-// ============================================================
 let currentPlaylist = defaultSongs; // whichever array next/back should navigate
 let songIndex = 0;
 let currentTrack = null;            // the track object actually loaded in audioElement
 
-// ============================================================
-// Helpers
-// ============================================================
 function formatTime(seconds) {
     seconds = Number(seconds);
     if (!isFinite(seconds) || seconds < 0) return "00:00";
@@ -88,10 +73,6 @@ function triggerNameAnimation() {
     songNameContainer.classList.add('playing');
 }
 
-// Single source of truth for syncing every icon/gif/name whenever play state changes.
-// Instead of looping a fixed "songItems" array, this now queries every .songItem
-// currently in the DOM (playlist panel AND search results) and compares by filePath —
-// so it works no matter how many lists are rendered at once.
 function updateUI(isPlaying) {
     play.src = isPlaying ? "icons/pause-solid-full.svg" : "icons/play-solid-full.svg";
     isPlaying ? play.classList.remove('play') : play.classList.add('play');
@@ -117,8 +98,6 @@ function updateUI(isPlaying) {
     });
 }
 
-// Plays any track object, from any list — this replaces the old playSong(index),
-// which only worked for the hardcoded "songs" array.
 function playTrack(track, list) {
     currentPlaylist = list;
     songIndex = list.indexOf(track);
@@ -129,11 +108,6 @@ function playTrack(track, list) {
     updateUI(true);
 }
 
-// ============================================================
-// Builds one songItem element for ANY track (default, search
-// result, or playlist track) — same structure/classes your CSS
-// already styles, just generated in JS instead of hardcoded HTML.
-// ============================================================
 function createSongItemElement(track, options = {}) {
     let el = document.createElement('div');
     el.className = 'songItem';
@@ -225,9 +199,6 @@ function renderPlaylist(list, title) {
     });
 }
 
-// ============================================================
-// Playlist tabs
-// ============================================================
 function renderPlaylistTabs() {
     playlistTabs.querySelectorAll('.tabBtn').forEach(btn => {
         if (btn.dataset.list !== 'default' && btn.id !== 'newPlaylistBtn') {
@@ -239,13 +210,42 @@ function renderPlaylistTabs() {
         let btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'tabBtn';
-        btn.innerText = name;
+
+        let label = document.createElement('span');
+        label.innerText = name;
+        btn.appendChild(label);
+
+        let deleteBtn = document.createElement('span');
+        deleteBtn.className = 'deletePlaylistBtn';
+        deleteBtn.innerText = '×';
+        deleteBtn.title = 'Delete playlist';
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // don't trigger the tab's own click handler below
+            deletePlaylist(name);
+        });
+        btn.appendChild(deleteBtn);
+
         btn.addEventListener('click', () => {
             setActiveTab(btn);
             renderPlaylist(playlists[name], name);
         });
         playlistTabs.insertBefore(btn, newPlaylistBtn);
     });
+}
+
+function deletePlaylist(name) {
+    if (!confirm(`Delete the playlist "${name}"? This can't be undone.`)) return;
+
+    let wasActive = currentPlaylist === playlists[name];
+
+    delete playlists[name];
+    savePlaylists();
+    renderPlaylistTabs();
+
+    if (wasActive) {
+        setActiveTab(document.querySelector('.tabBtn[data-list="default"]'));
+        renderPlaylist(defaultSongs, "YadGar-e-Donya");
+    }
 }
 
 function setActiveTab(activeBtn) {
@@ -270,9 +270,6 @@ newPlaylistBtn.addEventListener('click', () => {
     renderPlaylistTabs();
 });
 
-// ============================================================
-// Add-to-playlist picker (simple prompt-based UI for now)
-// ============================================================
 function openAddToPlaylistPicker(track) {
     let names = Object.keys(playlists);
 
@@ -299,27 +296,24 @@ function openAddToPlaylistPicker(track) {
     alert(`Added to "${choice}"`);
 }
 
-// ============================================================
-// Jamendo search
-// ============================================================
-async function searchJamendo(query) {
-    if (!JAMENDO_CLIENT_ID || JAMENDO_CLIENT_ID === "YOUR_JAMENDO_CLIENT_ID") {
-        throw new Error("API Error");
+async function searchAudius(query) {
+    let url = `${AUDIUS_API_BASE}/v1/tracks/search?query=${encodeURIComponent(query)}&app_name=${AUDIUS_APP_NAME}`;
+    let res = await fetch(url);
+
+    if (!res.ok) {
+        throw new Error(`Audius API error: HTTP ${res.status}`);
     }
 
-    let url = `https://api.jamendo.com/v3.0/tracks/?client_id=${JAMENDO_CLIENT_ID}&format=json&limit=20&search=${encodeURIComponent(query)}`;
-    let res = await fetch(url);
     let data = await res.json();
 
-    if (!data.headers || data.headers.status !== "success") {
-        let reason = (data.headers && data.headers.error_message) || `HTTP ${res.status}`;
-        throw new Error(`Jamendo API error: ${reason}`);
+    if (!Array.isArray(data.data)) {
+        throw new Error("Audius API returned an unexpected response.");
     }
 
-    return data.results.map(track => ({
-        songName: `${track.name} - ${track.artist_name}`,
-        filePath: track.audio,
-        coverPath: track.image,
+    return data.data.map(track => ({
+        songName: `${track.title} - ${track.user.name}`,
+        filePath: `${AUDIUS_API_BASE}/v1/tracks/${track.id}/stream?app_name=${AUDIUS_APP_NAME}`,
+        coverPath: track.artwork ? (track.artwork["480x480"] || track.artwork["150x150"]) : "covers/1.jfif",
         duration: track.duration
     }));
 }
@@ -332,7 +326,7 @@ searchForm.addEventListener('submit', async (e) => {
     searchResultsEl.innerHTML = '<p class="searchStatus">Searching...</p>';
 
     try {
-        let results = await searchJamendo(query);
+        let results = await searchAudius(query);
         searchResultsEl.innerHTML = '';
         if (results.length === 0) {
             searchResultsEl.innerHTML = '<p class="searchStatus">No results found.</p>';
@@ -347,10 +341,6 @@ searchForm.addEventListener('submit', async (e) => {
     }
 });
 
-// ============================================================
-// Transport controls (progress bar, skip, volume — same as before,
-// just now aware that there might be no track loaded yet)
-// ============================================================
 play.addEventListener('click', () => {
     if (!currentTrack) return;
     if (audioElement.paused) {
@@ -404,8 +394,5 @@ soundbar.addEventListener("input", () => {
     audioElement.volume = soundbar.value / 100;
 });
 
-// ============================================================
-// Initial render
-// ============================================================
 renderPlaylistTabs();
 renderPlaylist(defaultSongs, "YadGar-e-Donya");
