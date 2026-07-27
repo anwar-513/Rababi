@@ -360,13 +360,16 @@ ul {
     display: flex;
     align-items: center;
     margin-left: 20px;
+    width: 15%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .songName img {
     width: 56px;
     height: 46px;
     display: block;
-
+    flex-shrink: 0;
 }
 
 #gif {
@@ -374,20 +377,44 @@ ul {
     transition: opacity 1s ease-in;
 }
 
-.songName span {
+.nameViewport {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
     font-size: 19px;
     padding: 10px 0;
     margin-left: 5px;
     margin-top: 5px;
-    display: inline-block;
     opacity: 0;
 }
 
-
-.songName.playing span {
+.songName.playing .nameViewport {
     animation: fadeSlideIn 0.5s ease forwards;
 }
 
+.nameText {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.nameText.scrolling {
+    padding-left: 100%;
+    animation-name: marquee;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
 
 @keyframes fadeSlideIn {
     from {
@@ -399,8 +426,4 @@ ul {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.songName img {
-    transition: opacity 0.4s ease;
 }

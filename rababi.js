@@ -10,7 +10,8 @@ let backward = document.getElementById('backward');
 let nextStep = document.getElementById('nextStep');
 let backStep = document.getElementById('backStep');
 let songNameContainer = document.querySelector('.buttom .songName');
-let songNameSpan = songNameContainer.querySelector('span');
+let nameViewport = songNameContainer.querySelector('.nameViewport');
+let songNameSpan = songNameContainer.querySelector('.nameText');
 let bottomGif = songNameContainer.querySelector('img');
 let timelineSpan = document.querySelector('.buttom .timeline');
 
@@ -69,6 +70,26 @@ function triggerNameAnimation() {
     songNameContainer.classList.add('playing');
 }
 
+// Only scrolls the name if it's actually too long to fit — short names
+// just sit still. Scroll speed stays constant regardless of text length,
+// by scaling the animation duration to the text's measured width.
+function updateMarquee() {
+    songNameSpan.classList.remove('scrolling');
+    songNameSpan.style.animation = 'none';
+    void songNameSpan.offsetWidth; // force reflow before re-measuring
+
+    let overflowAmount = songNameSpan.scrollWidth - nameViewport.clientWidth;
+
+    if (overflowAmount > 0) {
+        let pixelsPerSecond = 45;
+        let duration = (songNameSpan.scrollWidth + nameViewport.clientWidth) / pixelsPerSecond;
+        songNameSpan.style.animation = `marquee ${duration}s linear infinite`;
+        songNameSpan.classList.add('scrolling');
+    } else {
+        songNameSpan.style.animation = '';
+    }
+}
+
 function updateUI(isPlaying) {
     play.src = isPlaying ? "icons/pause-solid-full.svg" : "icons/play-solid-full.svg";
     isPlaying ? play.classList.remove('play') : play.classList.add('play');
@@ -76,6 +97,7 @@ function updateUI(isPlaying) {
 
     if (currentTrack) {
         songNameSpan.innerText = currentTrack.songName;
+        updateMarquee();
     }
 
     if (isPlaying) {
