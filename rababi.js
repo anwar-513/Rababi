@@ -25,15 +25,8 @@ let searchResultsEl = document.getElementById('searchResults');
 soundbar.value = 100;
 audioElement.volume = 1;
 
-// This is now only used ONCE, as seed data the first time the app ever
-// runs on a browser — after that, it lives in localStorage like any
-// other playlist the user creates, and can be renamed/edited/deleted
-// the same way.
-const seedSongs = [
-    { songName: "Azhar Khan new Song", filePath: "songs/1.mp3", coverPath: "covers/1.jfif" },
-    { songName: "Stargy Ghazal - Haroon Bacha", filePath: "songs/2.mp3", coverPath: "covers/2.png" },
-    { songName: "Peakey - Azhar Khan", filePath: "songs/3.mp3", coverPath: "covers/3.jfif" },
-];
+
+const seedSongs = [];
 
 const STORAGE_KEY = "rababi_playlists";
 
