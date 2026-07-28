@@ -110,7 +110,7 @@ ul li {
     color: #eadbc9;
     align-items: center;
     width: fit-content;
-    max-width: 100%;
+    max-width: 75%;
     overflow: hidden;
 
 }
@@ -177,6 +177,7 @@ ul li {
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 10px;
+
 }
 
 .tabBtn {
@@ -436,7 +437,7 @@ ul {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.584);
     align-items: center;
     justify-content: center;
     z-index: 1000;
@@ -449,12 +450,13 @@ ul {
 .modalBox {
     position: relative;
     overflow: hidden;
-    background-color: #f1ba7730;
+    background-color: #dab483a5;
     border: #280900 solid 2px;
+    border-color: #000000;
     border-radius: 20px;
     padding: 24px;
     width: min(90%, 380px);
-    color: #eadbc9;
+    color: #fffefe;
     font-family: "Galindo", sans-serif;
 }
 
@@ -495,9 +497,9 @@ ul {
     width: 100%;
     padding: 8px 14px;
     border-radius: 20px;
-    border: #fffefe solid 2px;
-    background: #ecb77698;
-    color: #000000;
+    border: #000000 solid 2px;
+    background: #000000;
+    color: #f4f4f4;
     font-family: "Galindo", sans-serif;
     outline: none;
     box-sizing: border-box;
@@ -510,14 +512,14 @@ ul {
     max-height: 30vh;
     overflow-y: auto;
     margin-bottom: 10px;
-}
+}  
 
 .modalListItem {
     padding: 8px 14px;
     border-radius: 14px;
     border: #280900 solid 1px;
-    background: #78460998;
-    color: #eadbc9;
+    background: #784609f9;
+    color: #ffffff;
     font-family: "Galindo", sans-serif;
     text-align: left;
     cursor: pointer;
