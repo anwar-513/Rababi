@@ -23,8 +23,56 @@ let searchForm = document.getElementById('searchForm');
 let searchInput = document.getElementById('searchInput');
 let searchResultsEl = document.getElementById('searchResults');
 
+let modalOverlay = document.getElementById('modalOverlay');
+let modalBox = document.getElementById('modalBox');
+let modalTitle = document.getElementById('modalTitle');
+let modalBody = document.getElementById('modalBody');
+let modalCancelBtn = document.getElementById('modalCancelBtn');
+let modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
 soundbar.value = 100;
 audioElement.volume = 1;
+
+// ============================================================
+// Generic modal — one reusable box, reconfigured each time it opens.
+// variant picks which background illustration shows via CSS class.
+// ============================================================
+function openModal({ title, variant, bodyHTML, confirmLabel = "Confirm", onConfirm }) {
+    modalTitle.innerText = title;
+    modalBody.innerHTML = bodyHTML;
+    modalConfirmBtn.innerText = confirmLabel;
+    modalBox.className = 'modalBox ' + variant;
+
+    modalConfirmBtn.onclick = onConfirm;
+
+    let firstInput = modalBody.querySelector('input');
+    if (firstInput) {
+        firstInput.focus();
+        firstInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                modalConfirmBtn.click();
+            }
+        });
+    }
+
+    modalOverlay.classList.add('open');
+}
+
+function closeModal() {
+    modalOverlay.classList.remove('open');
+    modalConfirmBtn.onclick = null;
+}
+
+modalCancelBtn.addEventListener('click', closeModal);
+
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
+});
 
 
 const seedSongs = [];
@@ -147,7 +195,7 @@ function createSongItemElement(track, options = {}) {
     el.appendChild(listPlaySpan);
 
     let itemGif = document.createElement('img');
-    itemGif.src = 'gif.gif';
+    itemGif.src = 'images/gif.gif';
     itemGif.alt = 'gif';
     itemGif.className = 'itemGif';
     itemGif.style.opacity = 0;
@@ -285,28 +333,35 @@ function renderPlaylistTabs() {
 }
 
 function deletePlaylist(name) {
-    if (!confirm(`Delete the playlist "${name}"? This can't be undone.`)) return;
+    openModal({
+        title: `Delete "${name}"?`,
+        variant: "deletePlaylist",
+        bodyHTML: "<p>This can't be undone.</p>",
+        confirmLabel: "Delete",
+        onConfirm: () => {
+            let wasActive = name === activePlaylistName;
 
-    let wasActive = name === activePlaylistName;
+            delete playlists[name];
+            savePlaylists();
 
-    delete playlists[name];
-    savePlaylists();
+            if (wasActive) {
+                let remainingNames = Object.keys(playlists);
+                activePlaylistName = remainingNames[0] || null;
 
-    if (wasActive) {
-        let remainingNames = Object.keys(playlists);
-        activePlaylistName = remainingNames[0] || null;
+                if (activePlaylistName) {
+                    renderPlaylist(playlists[activePlaylistName], activePlaylistName);
+                } else {
+                    currentPlaylist = [];
+                    currentTrack = null;
+                    playlistTitle.innerText = "No playlists yet";
+                    playlistEl.querySelectorAll('.songItem').forEach(el => el.remove());
+                }
+            }
 
-        if (activePlaylistName) {
-            renderPlaylist(playlists[activePlaylistName], activePlaylistName);
-        } else {
-            currentPlaylist = [];
-            currentTrack = null;
-            playlistTitle.innerText = "No playlists yet";
-            playlistEl.querySelectorAll('.songItem').forEach(el => el.remove());
+            renderPlaylistTabs();
+            closeModal();
         }
-    }
-
-    renderPlaylistTabs();
+    });
 }
 
 function setActiveTab(activeBtn) {
@@ -315,43 +370,70 @@ function setActiveTab(activeBtn) {
 }
 
 newPlaylistBtn.addEventListener('click', () => {
-    let name = prompt("Name your new playlist:");
-    if (!name) return;
-    if (playlists[name]) {
-        alert("A playlist with that name already exists.");
-        return;
-    }
-    playlists[name] = [];
-    savePlaylists();
-    activePlaylistName = name;
-    renderPlaylistTabs();
-    renderPlaylist(playlists[name], name);
+    openModal({
+        title: "Create a new playlist",
+        variant: "createPlaylist",
+        bodyHTML: '<input type="text" id="newPlaylistInput" class="modalInput" placeholder="Playlist name">',
+        confirmLabel: "Create",
+        onConfirm: () => {
+            let name = document.getElementById('newPlaylistInput').value.trim();
+            if (!name) return;
+            if (playlists[name]) {
+                alert("A playlist with that name already exists.");
+                return;
+            }
+            playlists[name] = [];
+            savePlaylists();
+            activePlaylistName = name;
+            renderPlaylistTabs();
+            renderPlaylist(playlists[name], name);
+            closeModal();
+        }
+    });
 });
 
 function openAddToPlaylistPicker(track) {
     let names = Object.keys(playlists);
 
-    if (names.length === 0) {
-        let name = prompt("You don't have any playlists yet. Name one to create it and add this song:");
-        if (!name) return;
-        playlists[name] = [track];
-        savePlaylists();
-        renderPlaylistTabs();
-        alert(`Added to "${name}"`);
-        return;
-    }
+    let listHTML = names.length
+        ? names.map(name => `<button type="button" class="modalListItem" data-name="${name}">${name}</button>`).join('')
+        : '<p>No playlists yet — create one below.</p>';
 
-    let choice = prompt(`Add "${track.songName}" to which playlist?\n\n${names.join('\n')}\n\n(Type a name exactly, or a new name to create one)`);
-    if (!choice) return;
+    openModal({
+        title: `Add "${track.songName}" to...`,
+        variant: "addSong",
+        bodyHTML: `
+            <div class="modalList">${listHTML}</div>
+            <div class="modalNewRow">
+                <input type="text" id="newPlaylistInlineInput" placeholder="Or create a new playlist...">
+            </div>
+        `,
+        confirmLabel: "Add",
+        onConfirm: () => {
+            let inlineName = document.getElementById('newPlaylistInlineInput').value.trim();
+            let selectedBtn = modalBody.querySelector('.modalListItem.selected');
+            let targetName = inlineName || (selectedBtn ? selectedBtn.dataset.name : null);
 
-    if (!playlists[choice]) playlists[choice] = [];
-    let alreadyIn = playlists[choice].some(t => t.filePath === track.filePath);
-    if (!alreadyIn) {
-        playlists[choice].push(track);
-        savePlaylists();
-    }
-    renderPlaylistTabs();
-    alert(`Added to "${choice}"`);
+            if (!targetName) return;
+
+            if (!playlists[targetName]) playlists[targetName] = [];
+            let alreadyIn = playlists[targetName].some(t => t.filePath === track.filePath);
+            if (!alreadyIn) {
+                playlists[targetName].push(track);
+                savePlaylists();
+            }
+
+            renderPlaylistTabs();
+            closeModal();
+        }
+    });
+
+    modalBody.querySelectorAll('.modalListItem').forEach(btn => {
+        btn.addEventListener('click', () => {
+            modalBody.querySelectorAll('.modalListItem').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+    });
 }
 
 async function searchAudius(query) {
